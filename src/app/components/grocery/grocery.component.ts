@@ -7,6 +7,10 @@ import {
   addToBucket,
   removeFromBucket,
 } from '../../store/actions/bucket.action';
+import {
+  selectGroceries,
+  selectGroceriesByType,
+} from '../../store/selectors/grocery.selector';
 
 @Component({
   selector: 'app-grocery',
@@ -17,12 +21,21 @@ import {
 })
 export class GroceryComponent {
   groceries$?: Observable<Grocery[]>;
+  selectedGroceriesByType$?: Observable<Grocery[]>;
 
   constructor(private store: Store<{ groceries: Grocery[] }>) {
-    this.groceries$ = this.store.select('groceries');
+    this.groceries$ = this.store.select(selectGroceries);
   }
 
-  onTypeChange(event: Event) {}
+  onTypeChange(event: Event) {
+    const groceryType = (event.target as HTMLSelectElement).value;
+
+    if (groceryType) {
+      this.selectedGroceriesByType$ = this.store.select(
+        selectGroceriesByType(groceryType)
+      );
+    } else this.selectedGroceriesByType$ = undefined;
+  }
 
   increment(item: Grocery) {
     const payload = {
